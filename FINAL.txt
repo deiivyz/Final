@@ -1,0 +1,40 @@
+CREATE OR REPLACE FUNCTION findSum(s IN VARCHAR)
+RETURN VARCHAR IS
+	resultado VARCHAR2(4000) := '';
+	suma NUMBER := 0;
+  limite NUMBER := 0;
+  ex exception;
+BEGIN
+    limite := TO_NUMBER(s);
+    
+    IF limite < 1 OR limite > 99999 THEN
+      DBMS_OUTPUT.PUT_LINE('Entró');
+      RAISE ex;
+    END IF;
+    
+    FOR cont IN 1 .. limite
+    LOOP
+    	IF (MOD(cont, 3) = 0) OR (MOD(cont, 5) = 0) THEN
+            suma := suma + cont;
+        END IF; 
+    END LOOP;
+    
+    resultado := TO_CHAR(suma);
+
+    RETURN resultado ;
+EXCEPTION
+WHEN ex THEN
+   DBMS_OUTPUT.PUT_LINE('El número '||s||' Está fuera del rango');
+END;
+
+CREATE TABLE sums(
+  base_value VARCHAR2(5),
+  result VARCHAR2(4000)
+);
+
+CREATE TRIGGER sumsDrivers BEFORE INSERT ON sums FOR EACH ROW
+BEGIN
+  :new.result := findSum(:new.base_value);
+END;
+
+INSERT INTO sums(BASE_VALUE) VALUES('1000');
